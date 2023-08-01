@@ -1,4 +1,4 @@
-# OpenCloze
+# Yap
 One vocab word a day mobile app. Language learning tool.
 
 A flashcard widget that lives on your homescreen, offering you full control over on how you want to learn vocabulary, including:

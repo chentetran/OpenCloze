@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.opencloze">
+    package="com.example.yap">
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -12,33 +12,35 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:description="@string/app_description"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.OpenCloze"
+        android:theme="@style/Theme.Yap"
         tools:targetApi="31">
 
         <service
-            android:name=".FetchSentenceService"
+            android:name="com.example.yap.FetchSentenceService"
             android:enabled="true"
             android:exported="true" />
 
         <receiver
-            android:name=".OpenClozeWidget"
+            android:name="com.example.yap.YapWidget"
+            android:label="@string/app_widget_flashcard_name"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.example.opencloze.OpenClozeWidget.ACTION_WIDGET_CLICK" />
-                <action android:name="com.example.opencloze.OpenClozeWidget.ACTION_PREFERENCES_UPDATE" />
-                <action android:name="com.example.opencloze.AlarmHelpers.ACTION_ALARM" />
+                <action android:name="com.example.yap.YapWidget.ACTION_WIDGET_CLICK" />
+                <action android:name="com.example.yap.YapWidget.ACTION_PREFERENCES_UPDATE" />
+                <action android:name="com.example.yap.AlarmHelpers.ACTION_ALARM" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/open_cloze_widget_info" />
+                android:resource="@xml/yap_widget_info" />
         </receiver>
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.yap.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

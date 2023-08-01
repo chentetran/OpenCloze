@@ -1,4 +1,4 @@
-package com.example.opencloze;
+package com.example.yap;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

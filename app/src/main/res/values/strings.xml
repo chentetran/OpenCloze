@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">OpenCloze</string>
-    <string name="appwidget_text">EXAMPLE</string>
+    <string name="app_name">Yap</string>
     <string name="add_widget">Add widget</string>
-    <string name="app_widget_description">This is an app widget description</string>
+    <string name="app_widget_description">Example sentence flashcards on your homescreen</string>
+    <string name="app_description">Advanced example sentences for language learning</string>
+    <string name="app_widget_flashcard_name">Yap sentence flashcards</string>
 </resources>

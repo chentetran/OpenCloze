@@ -1,6 +1,6 @@
-package com.example.opencloze;
+package com.example.yap;
 
-import static com.example.opencloze.AlarmHelpers.ACTION_ALARM;
+import static com.example.yap.AlarmHelpers.ACTION_ALARM;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -30,11 +29,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences sharedPrefs = getSharedPreferences("com.example.opencloze", Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
 
         sharedPrefs.registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> {
-            Intent intent = new Intent(getApplicationContext(), OpenClozeWidget.class);
-            intent.setAction(OpenClozeWidget.ACTION_PREFERENCES_UPDATE);
+            Intent intent = new Intent(getApplicationContext(), YapWidget.class);
+            intent.setAction(YapWidget.ACTION_PREFERENCES_UPDATE);
             sendBroadcast(intent);
         });
 
@@ -85,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateSentence() {
-        SharedPreferences sharedPrefs = getSharedPreferences("com.example.opencloze", Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         String exampleSentenceString = sharedPrefs.getString("exampleSentence", "");
         String exampleSentenceTranslationString = sharedPrefs.getString("exampleSentenceTranslation", "");
 

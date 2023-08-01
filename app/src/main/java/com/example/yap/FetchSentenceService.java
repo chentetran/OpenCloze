@@ -1,6 +1,6 @@
-package com.example.opencloze;
+package com.example.yap;
 
-import static com.example.opencloze.AlarmHelpers.ACTION_ALARM;
+import static com.example.yap.AlarmHelpers.ACTION_ALARM;
 
 import android.app.Service;
 import android.content.Context;
@@ -40,13 +40,13 @@ public class FetchSentenceService extends Service {
                         String exampleSentenceString = responseJson.getString("spanish");
                         String exampleSentenceTranslationString = responseJson.getString("english");
 
-                        SharedPreferences sharedPrefs = getSharedPreferences("com.example.opencloze", Context.MODE_PRIVATE);
+                        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPrefs.edit();
                         editor.putString("exampleSentence", exampleSentenceString);
                         editor.putString("exampleSentenceTranslation", exampleSentenceTranslationString);
                         editor.apply();
 
-                        Intent alarmWidgetIntent = new Intent(this, OpenClozeWidget.class);
+                        Intent alarmWidgetIntent = new Intent(this, YapWidget.class);
                         alarmWidgetIntent.setAction(ACTION_ALARM);
                         sendBroadcast(alarmWidgetIntent);
 

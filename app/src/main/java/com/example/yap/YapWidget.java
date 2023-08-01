@@ -1,8 +1,7 @@
-package com.example.opencloze;
+package com.example.yap;
 
-import static com.example.opencloze.AlarmHelpers.ACTION_ALARM;
+import static com.example.yap.AlarmHelpers.ACTION_ALARM;
 
-import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -11,31 +10,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-/**
- * Implementation of App Widget functionality.
- */
-public class OpenClozeWidget extends AppWidgetProvider {
+public class YapWidget extends AppWidgetProvider {
     public static final String ACTION_WIDGET_CLICK = "ActionWidgetClick";
     public static final String ACTION_PREFERENCES_UPDATE = "ActionPreferencesUpdate";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.open_cloze_widget);
-        SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.opencloze", Context.MODE_PRIVATE);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.yap_widget);
+        SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
 
         if (intent.getAction().equals(ACTION_WIDGET_CLICK)) {
             Log.d("onreceive", "click");
@@ -45,21 +34,21 @@ public class OpenClozeWidget extends AppWidgetProvider {
 
             sharedPrefs.edit().putBoolean("isCardFront", !isCardFront).apply();
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            appWidgetManager.updateAppWidget(new ComponentName(context, OpenClozeWidget.class), views);
+            appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
         }
 
         else if (intent.getAction().equals(ACTION_PREFERENCES_UPDATE)) {
             Log.d("onreceive", "preferences updated");
             applySettings(context, views);
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            appWidgetManager.updateAppWidget(new ComponentName(context, OpenClozeWidget.class), views);
+            appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
         }
 
         else if (intent.getAction().equals(ACTION_ALARM)) {
             Log.d("onreceive", "alarm");
             applySettings(context, views);
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            appWidgetManager.updateAppWidget(new ComponentName(context, OpenClozeWidget.class), views);
+            appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
         }
     }
 
@@ -68,12 +57,12 @@ public class OpenClozeWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.open_cloze_widget);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.yap_widget);
 
             applySettings(context, views);
 
             // Set click listener on widget
-            Intent clickIntent = new Intent(context, OpenClozeWidget.class);
+            Intent clickIntent = new Intent(context, YapWidget.class);
             clickIntent.setAction(ACTION_WIDGET_CLICK);
             PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_MUTABLE);
             views.setOnClickPendingIntent(R.id.widgetLayout, clickPendingIntent);
@@ -86,7 +75,7 @@ public class OpenClozeWidget extends AppWidgetProvider {
     }
 
     private void applySettings(Context context, RemoteViews views) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.opencloze", Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
 
         views.setTextViewText(R.id.exampleSentence, sharedPrefs.getString("exampleSentence", ""));

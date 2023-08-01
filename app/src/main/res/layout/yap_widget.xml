@@ -12,7 +12,7 @@
             android:layout_marginHorizontal="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ru: Advanced "
+            android:text="Yap：語言學習例句"
             android:textStyle="bold"
             android:textColor="@color/white" />
 
@@ -21,7 +21,7 @@
             android:layout_marginHorizontal="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Example sentence"
+            android:text="Yap: Example sentences for language learning"
             android:textStyle="italic"
             android:textColor="@color/white" />
 
