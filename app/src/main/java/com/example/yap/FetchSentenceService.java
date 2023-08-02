@@ -30,7 +30,7 @@ public class FetchSentenceService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("fetch sentence service", "try");
 
-        String url = "https://ru-backend-production.up.railway.app/";
+        String url = "https://yap-backend-production.up.railway.app/";
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 response -> {

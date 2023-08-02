@@ -13,7 +13,7 @@ import java.util.Calendar;
 
 public class AlarmHelpers {
     public static final String ACTION_ALARM = "ActionAlarm";
-    public static final int START_FETCH_SENTENCE_INTENT_REQUEST_CODE = 1;
+    public static final int START_FETCH_SENTENCE_INTENT_REQUEST_CODE = 20002;
 //    private static final int REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hrs in milliseconds
     private static final int REFRESH_INTERVAL = 600000; // 10 minutes
 

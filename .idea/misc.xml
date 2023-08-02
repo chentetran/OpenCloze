@@ -15,6 +15,10 @@
         <entry key="app/src/main/res/layout/flashcard_view.xml" value="0.2922998986828774" />
         <entry key="app/src/main/res/layout/new_app_widget.xml" value="0.3296875" />
         <entry key="app/src/main/res/layout/open_cloze_widget.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/widget_list_item.xml" value="0.2269021739130435" />
+        <entry key="app/src/main/res/layout/widget_list_item_example_sentence.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/yap_widget.xml" value="0.165" />
+        <entry key="app/src/main/res/layout/yap_widget_preview.xml" value="0.2269021739130435" />
       </map>
     </option>
   </component>

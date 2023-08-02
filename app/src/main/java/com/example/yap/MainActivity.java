@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -22,6 +23,12 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver alarmActionReceiver;
+    private final SharedPreferences.OnSharedPreferenceChangeListener listener = (sharedPreferences, s) -> {
+        Log.d("MainAcitivty", "sharedprefs changed");
+        Intent intent = new Intent(getApplicationContext(), YapWidget.class);
+        intent.setAction(YapWidget.ACTION_PREFERENCES_UPDATE);
+        sendBroadcast(intent);
+    };
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
@@ -30,12 +37,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
-
-        sharedPrefs.registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> {
-            Intent intent = new Intent(getApplicationContext(), YapWidget.class);
-            intent.setAction(YapWidget.ACTION_PREFERENCES_UPDATE);
-            sendBroadcast(intent);
-        });
 
         TextView exampleSentence = findViewById(R.id.exampleSentence);
         TextView exampleSentenceTranslation = findViewById(R.id.exampleSentenceTranslation);
@@ -54,14 +55,24 @@ public class MainActivity extends AppCompatActivity {
         setAllOnChangeListeners(sharedPrefs, exampleSentence,
                exampleSentenceTranslation, showExampleSentenceSwitch, showExampleSentenceTranslationSwitch);
 
-
         newSentenceButton.setOnClickListener(view -> {
             startFetchSentenceService();
         });
 
-        AlarmHelpers.setRepeatingAlarm(this);
+        initializeSentence();
 
         registerAlarmActionReceiver();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private void initializeSentence() {
+        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+        String exampleSentenceString = sharedPrefs.getString("exampleSentence", "");
+        String exampleSentenceTranslationString = sharedPrefs.getString("exampleSentenceTranslation", "");
+
+        if (exampleSentenceString.isEmpty() || exampleSentenceTranslationString.isEmpty()) {
+            startFetchSentenceService();
+        }
     }
 
     private void registerAlarmActionReceiver() {
@@ -156,9 +167,19 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         updateSentence();
+        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+        sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+        sharedPrefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     @Override
