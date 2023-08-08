@@ -1,7 +1,7 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widgetLayout"
+        android:id="@+id/widgetLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/layout_card_bg"
@@ -11,15 +11,14 @@
 
         <ListView
             android:id="@+id/listView"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_weight="1"
             android:scrollbars="vertical"
             android:dividerHeight="0dp"
             android:divider="@null"
             android:listSelector="@android:color/transparent"
-            >
+            />
 
-        </ListView>
+
 
 </LinearLayout>

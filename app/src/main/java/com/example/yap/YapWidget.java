@@ -25,6 +25,10 @@ public class YapWidget extends AppWidgetProvider {
         super.onReceive(context, intent);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.yap_widget);
         SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName yapWidgetComponent = new ComponentName(context.getPackageName(), YapWidget.class.getName());
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(yapWidgetComponent);
+
 
         if (intent.getAction().equals(ACTION_WIDGET_CLICK)) {
             Log.d("onreceive", "click");
@@ -33,22 +37,20 @@ public class YapWidget extends AppWidgetProvider {
             applySettings(context, views);
 
             sharedPrefs.edit().putBoolean("isCardFront", !isCardFront).apply();
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
             appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.listView);
         }
 
         else if (intent.getAction().equals(ACTION_PREFERENCES_UPDATE)) {
             Log.d("onreceive", "preferences updated");
             applySettings(context, views);
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
         }
 
         else if (intent.getAction().equals(ACTION_ALARM)) {
             Log.d("onreceive", "alarm");
             applySettings(context, views);
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
         }
     }
@@ -56,6 +58,7 @@ public class YapWidget extends AppWidgetProvider {
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        Log.d("onUpdate", "on update called");
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.yap_widget);
@@ -73,17 +76,15 @@ public class YapWidget extends AppWidgetProvider {
             views.setPendingIntentTemplate(R.id.listView, onItemClickPendingIntent);
 
             // Load sentences as listView
-            Intent widgetRemoveViewsServiceIntent = new Intent(context, WidgetRemoteViewsService.class);
-            views.setRemoteAdapter(R.id.listView, widgetRemoveViewsServiceIntent);
-
-
+            Intent widgetRemoteViewsServiceIntent = new Intent(context, WidgetRemoteViewsService.class);
+            views.setRemoteAdapter(R.id.listView, widgetRemoteViewsServiceIntent);
 
 
 //            // Set click listener on widget
-//            Intent clickIntent = new Intent(context, YapWidget.class);
-//            clickIntent.setAction(ACTION_WIDGET_CLICK);
-//            PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 10001, clickIntent, PendingIntent.FLAG_MUTABLE);
-//            views.setOnClickPendingIntent(R.id.widgetLayout, clickPendingIntent);
+            Intent clickIntent = new Intent(context, YapWidget.class);
+            clickIntent.setAction(ACTION_WIDGET_CLICK);
+            PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 10001, clickIntent, PendingIntent.FLAG_MUTABLE);
+            views.setOnClickPendingIntent(R.id.widgetLayout, clickPendingIntent);
 
 
             appWidgetManager.updateAppWidget(appWidgetId, views);
