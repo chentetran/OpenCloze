@@ -34,9 +34,10 @@ public class YapWidget extends AppWidgetProvider {
             Log.d("onreceive", "click");
             boolean isCardFront = sharedPrefs.getBoolean("isCardFront", true);
 
-            applySettings(context, views);
-
+            Log.d("click receiver", "isCardFront ? " + isCardFront);
             sharedPrefs.edit().putBoolean("isCardFront", !isCardFront).apply();
+
+            applySettings(context, views);
 
             appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.listView);
@@ -46,19 +47,29 @@ public class YapWidget extends AppWidgetProvider {
             Log.d("onreceive", "preferences updated");
             applySettings(context, views);
             appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.listView);
         }
 
         else if (intent.getAction().equals(ACTION_ALARM)) {
             Log.d("onreceive", "alarm");
             applySettings(context, views);
             appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.listView);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         Log.d("onUpdate", "on update called");
+        String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
+        String oppositeKeyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "back:" : "front:";
+        Log.d("Widget", "isCardFront? " + sharedPrefs.getBoolean("isCardFront", true));
+        Log.d("Widget Front", "show sentence? " + sharedPrefs.getBoolean(keyPrefix + "showExampleSentence", true));
+        Log.d("Widget Front", "show translation? " + sharedPrefs.getBoolean(keyPrefix + "showExampleSentenceTranslation", true));
+        Log.d("Widget Back", "show sentence? " + sharedPrefs.getBoolean(oppositeKeyPrefix + "showExampleSentence", true));
+        Log.d("Widget Back", "show translation? " + sharedPrefs.getBoolean(oppositeKeyPrefix + "showExampleSentenceTranslation", true));
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.yap_widget);
@@ -79,7 +90,6 @@ public class YapWidget extends AppWidgetProvider {
             Intent widgetRemoteViewsServiceIntent = new Intent(context, WidgetRemoteViewsService.class);
             views.setRemoteAdapter(R.id.listView, widgetRemoteViewsServiceIntent);
 
-
 //            // Set click listener on widget
             Intent clickIntent = new Intent(context, YapWidget.class);
             clickIntent.setAction(ACTION_WIDGET_CLICK);
@@ -88,7 +98,7 @@ public class YapWidget extends AppWidgetProvider {
 
 
             appWidgetManager.updateAppWidget(appWidgetId, views);
-//            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
         }
 
         // Start the AlarmManager countdown
@@ -98,9 +108,11 @@ public class YapWidget extends AppWidgetProvider {
 
 
     private void applySettings(Context context, RemoteViews views) {
+        Log.d("applySettings", "called");
+
         SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
-
+        Log.d("applySetting", "Changing to " + keyPrefix);
         views.setTextViewText(R.id.exampleSentence, sharedPrefs.getString("exampleSentence", ""));
         views.setTextViewText(R.id.exampleSentenceTranslation, sharedPrefs.getString("exampleSentenceTranslation", ""));
 

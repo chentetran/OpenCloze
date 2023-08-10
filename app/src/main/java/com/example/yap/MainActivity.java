@@ -46,13 +46,10 @@ public class MainActivity extends AppCompatActivity {
         SwitchMaterial showExampleSentenceTranslationSwitch = findViewById(R.id.showExampleSentenceTranslationSwitch);
         Button newSentenceButton = findViewById(R.id.newSentenceButton);
 
-        initializeSettings(sharedPrefs, flashcard, exampleSentence,
-                exampleSentenceTranslation, showExampleSentenceSwitch, showExampleSentenceTranslationSwitch);
-
         flashcard.setOnClickListener(view -> flipCard(sharedPrefs, view, exampleSentence,
                 exampleSentenceTranslation, showExampleSentenceSwitch, showExampleSentenceTranslationSwitch ));
 
-        setAllOnChangeListeners(sharedPrefs, exampleSentence,
+        setSwitchOnChangeListeners(exampleSentence,
                exampleSentenceTranslation, showExampleSentenceSwitch, showExampleSentenceTranslationSwitch);
 
         newSentenceButton.setOnClickListener(view -> {
@@ -60,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         initializeSentence();
-
-        registerAlarmActionReceiver();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
@@ -110,36 +105,33 @@ public class MainActivity extends AppCompatActivity {
                           SwitchMaterial showExampleSentenceSwitch, SwitchMaterial showExampleSentenceTranslationSwitch) {
         boolean isCardFront = sharedPrefs.getBoolean("isCardFront", true);
         sharedPrefs.edit().putBoolean("isCardFront", !isCardFront).apply();
-
-        // Need to remove onChangeListeners before calling initializeSettings again, or else the setChecked calls will mess up SharedPrefs
-        removeAllOnChangeListeners(showExampleSentenceSwitch, showExampleSentenceTranslationSwitch);
-        initializeSettings(sharedPrefs, flashcard, exampleSentence,
-                exampleSentenceTranslation, showExampleSentenceSwitch, showExampleSentenceTranslationSwitch);
-        // Re-set all the onChangeListeners
-        setAllOnChangeListeners(sharedPrefs, exampleSentence,
-                exampleSentenceTranslation, showExampleSentenceSwitch, showExampleSentenceTranslationSwitch);
+        applySettings();
     }
 
-    private void removeAllOnChangeListeners(SwitchMaterial showExampleSentenceSwitch, SwitchMaterial showExampleSentenceTranslationSwitch) {
-        showExampleSentenceSwitch.setOnCheckedChangeListener(null);
-        showExampleSentenceTranslationSwitch.setOnCheckedChangeListener(null);
-    }
-
-    private void setAllOnChangeListeners(SharedPreferences sharedPrefs, TextView exampleSentence, TextView exampleSentenceTranslation,
+    private void setSwitchOnChangeListeners(TextView exampleSentence, TextView exampleSentenceTranslation,
                                          SwitchMaterial showExampleSentenceSwitch, SwitchMaterial showExampleSentenceTranslationSwitch) {
-        String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
         showExampleSentenceSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+            SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+            String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
             sharedPrefs.edit().putBoolean(keyPrefix + "showExampleSentence", b).apply();
             exampleSentence.setVisibility(b ? View.VISIBLE : View.GONE);
         });
         showExampleSentenceTranslationSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+            SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+            String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
             sharedPrefs.edit().putBoolean(keyPrefix + "showExampleSentenceTranslation", b).apply();
             exampleSentenceTranslation.setVisibility(b ? View.VISIBLE : View.GONE);
         });
     }
 
-    private void initializeSettings(SharedPreferences sharedPrefs, View flashcard, TextView exampleSentence, TextView exampleSentenceTranslation,
-                                     SwitchMaterial showExampleSentenceSwitch, SwitchMaterial showExampleSentenceTranslationSwitch) {
+    private void applySettings() {
+        TextView exampleSentence = findViewById(R.id.exampleSentence);
+        TextView exampleSentenceTranslation = findViewById(R.id.exampleSentenceTranslation);
+
+        LinearLayout flashcard = findViewById(R.id.flashcard);
+        SwitchMaterial showExampleSentenceSwitch = findViewById(R.id.showExampleSentenceSwitch);
+        SwitchMaterial showExampleSentenceTranslationSwitch = findViewById(R.id.showExampleSentenceTranslationSwitch);
+        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
 
         if (sharedPrefs.getBoolean("isCardFront", true)) {
@@ -161,18 +153,14 @@ public class MainActivity extends AppCompatActivity {
         exampleSentenceTranslation.setVisibility(showExampleSentenceTranslationSharedPref ? View.VISIBLE : View.GONE);
     }
 
-//    private void restoreDefaultSettings(SharedPreferences sharedPrefs) {
-//        SharedPreferences.Editor editor = sharedPrefs.edit();
-//        editor.putBoolean()
-//    }
-
     @Override
     protected void onStart() {
+        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         super.onStart();
         updateSentence();
-        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+        applySettings();
         sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
-
+        registerAlarmActionReceiver();
     }
 
     @Override
@@ -180,12 +168,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(listener);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Unregister the BroadcastReceiver when the Activity is destroyed
         unregisterReceiver(alarmActionReceiver);
     }
 }

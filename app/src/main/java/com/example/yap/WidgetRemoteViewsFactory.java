@@ -66,11 +66,12 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
         RemoteViews remoteViews;
 
         SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
-        String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
+        boolean isCardFront = sharedPrefs.getBoolean("isCardFront", true);
+        String keyPrefix = isCardFront ? "front:" : "back:";
         boolean showExampleSentence = sharedPrefs.getBoolean(keyPrefix + "showExampleSentence", true);
         boolean showSentenceTranslation = sharedPrefs.getBoolean(keyPrefix + "showExampleSentenceTranslation", true);
 
-        Log.d("getViewAt ", "setting click action pending itennt");
+        Log.d("getviewAt ", keyPrefix);
 
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_list_item_example_sentence);
         remoteViews.setTextViewText(R.id.exampleSentence, itemList.get(i).get("exampleSentence"));
@@ -78,6 +79,14 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
         remoteViews.setViewVisibility(R.id.exampleSentence, showExampleSentence ? View.VISIBLE : View.GONE);
         remoteViews.setViewVisibility(R.id.exampleSentenceTranslation, showSentenceTranslation ? View.VISIBLE : View.GONE);
+
+        if (isCardFront) {
+            remoteViews.setTextColor(R.id.exampleSentence, context.getResources().getColor(R.color.black));
+            remoteViews.setTextColor(R.id.exampleSentenceTranslation, context.getResources().getColor(R.color.black));
+        } else {
+            remoteViews.setTextColor(R.id.exampleSentence, context.getResources().getColor(R.color.white));
+            remoteViews.setTextColor(R.id.exampleSentenceTranslation, context.getResources().getColor(R.color.white));
+        }
 
         Intent clickIntent = new Intent(context, YapWidget.class);
         clickIntent.setAction(ACTION_WIDGET_CLICK);
