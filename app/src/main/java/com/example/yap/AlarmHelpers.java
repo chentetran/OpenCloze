@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -39,14 +40,11 @@ public class AlarmHelpers {
         long triggerAtMillis = System.currentTimeMillis() + REFRESH_INTERVAL;
 
         alarmUp = (PendingIntent.getService(context, START_FETCH_SENTENCE_INTENT_REQUEST_CODE, startFetchSentenceIntent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) != null);
-        Log.d("alarmhelpers", "alarmup? " + alarmUp);
 
         if (!alarmUp) {
             PendingIntent pendingStartFetchSentenceIntent = PendingIntent.getService(context, START_FETCH_SENTENCE_INTENT_REQUEST_CODE, startFetchSentenceIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
             alarmManager.setRepeating(AlarmManager.RTC, triggerAtMillis, REFRESH_INTERVAL, pendingStartFetchSentenceIntent);
             alarmUp = true;
         }
-
-        Log.d("alarmhelpers", "alarmup2? " + alarmUp);
     }
 }

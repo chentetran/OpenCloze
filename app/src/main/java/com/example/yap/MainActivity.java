@@ -162,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
         applySettings();
         sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
         registerAlarmActionReceiver();
-        Log.d("Mainactivity onstart", "Alarm up? " + isAlarmSet());
     }
 
     @Override

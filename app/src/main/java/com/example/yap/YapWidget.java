@@ -92,7 +92,11 @@ public class YapWidget extends AppWidgetProvider {
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
         }
 
-        if (!isAlarmSet()) {
+        SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+        String exampleSentenceString = sharedPrefs.getString("exampleSentence", "");
+        String exampleSentenceTranslationString = sharedPrefs.getString("exampleSentenceTranslation", "");
+
+        if (!isAlarmSet() || exampleSentenceString.isEmpty() || exampleSentenceTranslationString.isEmpty()) {
             AlarmHelpers.setRepeatingAlarm(context);
         }
     }
