@@ -44,7 +44,6 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     @Override
     public void onDataSetChanged() {
-        Log.d("data", "changed");
         itemList.clear();
         getSentencesFromSharedPrefs();
     }
@@ -56,7 +55,6 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     @Override
     public int getCount() {
-        Log.d("factory", "getCount() called, itemCount: " + itemList.size());
         return itemList.size();
     }
 
@@ -70,8 +68,6 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
         String keyPrefix = isCardFront ? "front:" : "back:";
         boolean showExampleSentence = sharedPrefs.getBoolean(keyPrefix + "showExampleSentence", true);
         boolean showSentenceTranslation = sharedPrefs.getBoolean(keyPrefix + "showExampleSentenceTranslation", true);
-
-        Log.d("getviewAt ", keyPrefix);
 
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_list_item_example_sentence);
         remoteViews.setTextViewText(R.id.exampleSentence, itemList.get(i).get("exampleSentence"));

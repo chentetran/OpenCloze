@@ -1,6 +1,7 @@
 package com.example.yap;
 
 import static com.example.yap.AlarmHelpers.ACTION_ALARM;
+import static com.example.yap.AlarmHelpers.isAlarmSet;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,7 +25,6 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver alarmActionReceiver;
     private final SharedPreferences.OnSharedPreferenceChangeListener listener = (sharedPreferences, s) -> {
-        Log.d("MainAcitivty", "sharedprefs changed");
         Intent intent = new Intent(getApplicationContext(), YapWidget.class);
         intent.setAction(YapWidget.ACTION_PREFERENCES_UPDATE);
         sendBroadcast(intent);
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         String exampleSentenceString = sharedPrefs.getString("exampleSentence", "");
         String exampleSentenceTranslationString = sharedPrefs.getString("exampleSentenceTranslation", "");
 
-        if (exampleSentenceString.isEmpty() || exampleSentenceTranslationString.isEmpty()) {
+        if (!isAlarmSet() || exampleSentenceString.isEmpty() || exampleSentenceTranslationString.isEmpty()) {
             startFetchSentenceService();
         }
     }
@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         alarmActionReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.d("MainActivity", "received alarm action");
                 updateSentence();
             }
         };
@@ -161,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         applySettings();
         sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
         registerAlarmActionReceiver();
+        Log.d("Mainactivity onstart", "Alarm up? " + isAlarmSet());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.yap;
 
 import static com.example.yap.AlarmHelpers.ACTION_ALARM;
+import static com.example.yap.AlarmHelpers.isAlarmSet;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -20,21 +21,20 @@ public class YapWidget extends AppWidgetProvider {
     public static final String ACTION_WIDGET_CLICK = "ActionWidgetClick";
     public static final String ACTION_PREFERENCES_UPDATE = "ActionPreferencesUpdate";
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+        Log.d("widget onreceive", "received " + intent.getAction());
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.yap_widget);
         SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         ComponentName yapWidgetComponent = new ComponentName(context.getPackageName(), YapWidget.class.getName());
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(yapWidgetComponent);
 
-
         if (intent.getAction().equals(ACTION_WIDGET_CLICK)) {
-            Log.d("onreceive", "click");
             boolean isCardFront = sharedPrefs.getBoolean("isCardFront", true);
 
-            Log.d("click receiver", "isCardFront ? " + isCardFront);
             sharedPrefs.edit().putBoolean("isCardFront", !isCardFront).apply();
 
             applySettings(context, views);
@@ -44,7 +44,6 @@ public class YapWidget extends AppWidgetProvider {
         }
 
         else if (intent.getAction().equals(ACTION_PREFERENCES_UPDATE)) {
-            Log.d("onreceive", "preferences updated");
             applySettings(context, views);
             appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.listView);
@@ -55,21 +54,13 @@ public class YapWidget extends AppWidgetProvider {
             applySettings(context, views);
             appWidgetManager.updateAppWidget(new ComponentName(context, YapWidget.class), views);
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.listView);
+            AlarmHelpers.setRepeatingAlarm(context);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
-        Log.d("onUpdate", "on update called");
-        String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
-        String oppositeKeyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "back:" : "front:";
-        Log.d("Widget", "isCardFront? " + sharedPrefs.getBoolean("isCardFront", true));
-        Log.d("Widget Front", "show sentence? " + sharedPrefs.getBoolean(keyPrefix + "showExampleSentence", true));
-        Log.d("Widget Front", "show translation? " + sharedPrefs.getBoolean(keyPrefix + "showExampleSentenceTranslation", true));
-        Log.d("Widget Back", "show sentence? " + sharedPrefs.getBoolean(oppositeKeyPrefix + "showExampleSentence", true));
-        Log.d("Widget Back", "show translation? " + sharedPrefs.getBoolean(oppositeKeyPrefix + "showExampleSentenceTranslation", true));
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.yap_widget);
@@ -101,18 +92,16 @@ public class YapWidget extends AppWidgetProvider {
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
         }
 
-        // Start the AlarmManager countdown
-        AlarmHelpers.setRepeatingAlarm(context);
+        if (!isAlarmSet()) {
+            AlarmHelpers.setRepeatingAlarm(context);
+        }
     }
     
 
 
     private void applySettings(Context context, RemoteViews views) {
-        Log.d("applySettings", "called");
-
         SharedPreferences sharedPrefs = context.getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
         String keyPrefix = sharedPrefs.getBoolean("isCardFront", true) ? "front:" : "back:";
-        Log.d("applySetting", "Changing to " + keyPrefix);
         views.setTextViewText(R.id.exampleSentence, sharedPrefs.getString("exampleSentence", ""));
         views.setTextViewText(R.id.exampleSentenceTranslation, sharedPrefs.getString("exampleSentenceTranslation", ""));
 
@@ -140,7 +129,6 @@ public class YapWidget extends AppWidgetProvider {
         String exampleSentenceTranslationString = sharedPrefs.getString("exampleSentenceTranslation", "");
 
         if (exampleSentenceString.isEmpty() || exampleSentenceTranslationString.isEmpty()) {
-            Log.d("here", "here");
             Intent serviceIntent = new Intent(context, FetchSentenceService.class);
             context.startService(serviceIntent);
         }

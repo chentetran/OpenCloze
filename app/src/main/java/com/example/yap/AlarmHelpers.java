@@ -16,12 +16,16 @@ public class AlarmHelpers {
     public static final int START_FETCH_SENTENCE_INTENT_REQUEST_CODE = 20002;
 //    private static final int REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hrs in milliseconds
     private static final int REFRESH_INTERVAL = 600000; // 10 minutes
+    private static boolean alarmUp = false;
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    public static boolean isAlarmSet() {
+        return alarmUp;
+    };
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     public static void setRepeatingAlarm(Context context) {
-
         Intent startFetchSentenceIntent = new Intent(context, FetchSentenceService.class);
-        PendingIntent pendingStartFetchSentenceIntent = PendingIntent.getService(context, START_FETCH_SENTENCE_INTENT_REQUEST_CODE, startFetchSentenceIntent, PendingIntent.FLAG_MUTABLE);
 
         // Create alarm that fires at midnight everyday
         Calendar calendar = Calendar.getInstance();
@@ -34,8 +38,15 @@ public class AlarmHelpers {
         // Temporary, to see if it works every 10 minutes.
         long triggerAtMillis = System.currentTimeMillis() + REFRESH_INTERVAL;
 
-        alarmManager.setRepeating(AlarmManager.RTC, triggerAtMillis, REFRESH_INTERVAL, pendingStartFetchSentenceIntent);
+        alarmUp = (PendingIntent.getService(context, START_FETCH_SENTENCE_INTENT_REQUEST_CODE, startFetchSentenceIntent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) != null);
+        Log.d("alarmhelpers", "alarmup? " + alarmUp);
 
-        Log.d("alarmHelper", "alarmset");
+        if (!alarmUp) {
+            PendingIntent pendingStartFetchSentenceIntent = PendingIntent.getService(context, START_FETCH_SENTENCE_INTENT_REQUEST_CODE, startFetchSentenceIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
+            alarmManager.setRepeating(AlarmManager.RTC, triggerAtMillis, REFRESH_INTERVAL, pendingStartFetchSentenceIntent);
+            alarmUp = true;
+        }
+
+        Log.d("alarmhelpers", "alarmup2? " + alarmUp);
     }
 }
