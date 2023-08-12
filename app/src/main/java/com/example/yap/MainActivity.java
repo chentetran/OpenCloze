@@ -12,15 +12,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
-
 
 public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver alarmActionReceiver;
@@ -46,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         SwitchMaterial showExampleSentenceTranslationSwitch = findViewById(R.id.showExampleSentenceTranslationSwitch);
         Button newSentenceButton = findViewById(R.id.newSentenceButton);
 
+        initializeSentence();
+
         flashcard.setOnClickListener(view -> flipCard(sharedPrefs, view, exampleSentence,
                 exampleSentenceTranslation, showExampleSentenceSwitch, showExampleSentenceTranslationSwitch ));
 
@@ -56,14 +60,79 @@ public class MainActivity extends AppCompatActivity {
             startFetchSentenceService();
         });
 
-        initializeSentence();
+        populateSpinners();
+    }
+
+    private void populateSpinners() {
+        SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+        String targetLangSetting = sharedPrefs.getString("targetLang", "");
+        String nativeLangSetting = sharedPrefs.getString("nativeLang", "");
+        String cefrLvl = sharedPrefs.getString("cefrLevel", "A1");
+
+        Spinner targetLanguageSpinner = findViewById(R.id.targetLanguageSpinner);
+        ArrayAdapter<CharSequence> targetLangsAdapter = ArrayAdapter.createFromResource(this, R.array.target_language_options, android.R.layout.simple_spinner_dropdown_item);
+        targetLangsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        targetLanguageSpinner.setAdapter(targetLangsAdapter);
+        targetLanguageSpinner.setSelection(targetLangsAdapter.getPosition(targetLangSetting));
+        targetLanguageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedItem = adapterView.getItemAtPosition(i).toString();
+                sharedPrefs.edit().putString("targetLang", selectedItem).apply();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
+
+        Spinner nativeLanguageSpinner = findViewById(R.id.nativeLanguageSpinner);
+        ArrayAdapter<CharSequence> nativeLangsAdapter = ArrayAdapter.createFromResource(this, R.array.native_language_options, android.R.layout.simple_spinner_dropdown_item);
+        nativeLangsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        nativeLanguageSpinner.setAdapter(nativeLangsAdapter);
+        nativeLanguageSpinner.setSelection(nativeLangsAdapter.getPosition(nativeLangSetting));
+        nativeLanguageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedItem = adapterView.getItemAtPosition(i).toString();
+                sharedPrefs.edit().putString("nativeLang", selectedItem).apply();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
+
+        Spinner cefrLvlSpinner = findViewById(R.id.cefrLevelSpinner);
+        ArrayAdapter<CharSequence> cefrLvlAdapter = ArrayAdapter.createFromResource(this, R.array.cefr_level_options, android.R.layout.simple_spinner_dropdown_item);
+        cefrLvlAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cefrLvlSpinner.setAdapter(cefrLvlAdapter);
+        cefrLvlSpinner.setSelection(cefrLvlAdapter.getPosition(cefrLvl));
+        cefrLvlSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedItem = adapterView.getItemAtPosition(i).toString();
+                sharedPrefs.edit().putString("cefrLevel", selectedItem).apply();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     private void initializeSentence() {
         SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
         String exampleSentenceString = sharedPrefs.getString("exampleSentence", "");
         String exampleSentenceTranslationString = sharedPrefs.getString("exampleSentenceTranslation", "");
+        String targetLangSetting = sharedPrefs.getString("targetLang", "");
+        String nativeLangSetting = sharedPrefs.getString("nativeLang", "");
+
+
+        if (targetLangSetting.isEmpty() ) {
+            editor.putString("targetLang", "Spanish");
+        }
+        if (nativeLangSetting.isEmpty()) {
+            editor.putString("nativeLang", "English");
+        }
+        editor.apply();
+
 
         if (!isAlarmSet() || exampleSentenceString.isEmpty() || exampleSentenceTranslationString.isEmpty()) {
             startFetchSentenceService();

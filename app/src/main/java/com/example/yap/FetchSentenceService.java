@@ -37,8 +37,8 @@ public class FetchSentenceService extends Service {
                     try {
                         Log.d("fetch sentence service", response);
                         JSONObject responseJson = new JSONObject(response);
-                        String exampleSentenceString = responseJson.getString("spanish");
-                        String exampleSentenceTranslationString = responseJson.getString("english");
+                        String exampleSentenceString = responseJson.getString("target_lang");
+                        String exampleSentenceTranslationString = responseJson.getString("native_lang");
 
                         SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -68,8 +68,15 @@ public class FetchSentenceService extends Service {
             @Nullable
             @Override
             protected Map<String, String> getParams() {
+                SharedPreferences sharedPrefs = getSharedPreferences("com.example.yap", Context.MODE_PRIVATE);
+                String targetLang = sharedPrefs.getString("targetLang", "");
+                String nativeLang = sharedPrefs.getString("nativeLang", "");
+                String cefrLevel = sharedPrefs.getString("cefrLevel", "A1");
+
                 Map<String, String> params = new HashMap<>();
-                params.put("cefr_level", "C1");
+                params.put("cefr_level", cefrLevel);
+                params.put("target_language", targetLang);
+                params.put("native_language", nativeLang);
                 return params;
             }
         };
