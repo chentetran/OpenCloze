@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         String targetLangSetting = sharedPrefs.getString("targetLang", "");
         String nativeLangSetting = sharedPrefs.getString("nativeLang", "");
         String cefrLvl = sharedPrefs.getString("cefrLevel", "A1");
+        String refreshInterval = sharedPrefs.getString("refreshInterval", "");
 
         Spinner targetLanguageSpinner = findViewById(R.id.targetLanguageSpinner);
         ArrayAdapter<CharSequence> targetLangsAdapter = ArrayAdapter.createFromResource(this, R.array.target_language_options, android.R.layout.simple_spinner_dropdown_item);
@@ -113,6 +114,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
+
+        Context mContext = this;
+        Spinner refreshIntervalSpinner = findViewById(R.id.refreshIntervalSpinner);
+        ArrayAdapter<CharSequence> refreshIntervalAdapter = ArrayAdapter.createFromResource(this, R.array.refresh_interval_options_keys, android.R.layout.simple_spinner_dropdown_item);
+        refreshIntervalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        refreshIntervalSpinner.setAdapter(refreshIntervalAdapter);
+        refreshIntervalSpinner.setSelection(refreshIntervalAdapter.getPosition(refreshInterval));
+        refreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @RequiresApi(api = Build.VERSION_CODES.S)
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedItem = adapterView.getItemAtPosition(i).toString();
+                sharedPrefs.edit().putString("refreshInterval", selectedItem).apply();
+                AlarmHelpers.setRepeatingAlarm(mContext);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
@@ -123,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
         String exampleSentenceTranslationString = sharedPrefs.getString("exampleSentenceTranslation", "");
         String targetLangSetting = sharedPrefs.getString("targetLang", "");
         String nativeLangSetting = sharedPrefs.getString("nativeLang", "");
+        String refreshInterval = sharedPrefs.getString("refreshInterval", "");
 
 
         if (targetLangSetting.isEmpty() ) {
@@ -130,6 +150,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if (nativeLangSetting.isEmpty()) {
             editor.putString("nativeLang", "English");
+        }
+        if (refreshInterval.isEmpty()) {
+            editor.putString("refreshInterval", "1 hour");
         }
         editor.apply();
 
